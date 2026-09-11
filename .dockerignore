@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.git/
+.vscode/
+.quiz_bot.lock
+test_bot_flow.py
