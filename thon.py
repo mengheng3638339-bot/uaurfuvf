@@ -445,6 +445,13 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ANSWER
 # =========================
 
+async def edit_answer_message(query, text):
+    if query.message and query.message.photo:
+        await query.edit_message_caption(caption=text)
+    else:
+        await query.edit_message_text(text)
+
+
 async def answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -457,17 +464,17 @@ async def answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         q_index = int(q_index)
         choice = int(choice)
     except ValueError:
-        await query.edit_message_text("❌ Invalid answer")
+        await edit_answer_message(query, "❌ Invalid answer")
         return
 
     user_id = query.from_user.id
     user = users.get(user_id)
     if not user or q_index != user["question"]:
-        await query.edit_message_text("⚠️ សំណួរនេះមិនសកម្មទៀតទេ។ សូមប្រើ /start ដើម្បីចាប់ផ្ដើមថ្មី។")
+        await edit_answer_message(query, "⚠️ សំណួរនេះមិនសកម្មទៀតទេ។ សូមប្រើ /start ដើម្បីចាប់ផ្ដើមថ្មី។")
         return
 
     if q_index < 0 or q_index >= len(questions) or choice < 0 or choice >= len(questions[q_index]["options"]):
-        await query.edit_message_text("❌ Invalid answer")
+        await edit_answer_message(query, "❌ Invalid answer")
         return
 
     if choice == questions[q_index]["answer"]:
@@ -479,7 +486,7 @@ async def answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user["question"] += 1
     save_users()  # Save after each answer
 
-    await query.edit_message_text(f"✅ ចម្លើយទី {answer_number} ត្រូវបានកត់ត្រា។")
+    await edit_answer_message(query, f"✅ ចម្លើយទី {answer_number} ត្រូវបានកត់ត្រា។")
 
     await send_question(update, context)
 
